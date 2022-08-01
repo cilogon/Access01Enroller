@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+
+<schema version="0.3">
+    <table name="access01_enrollers">
+        <field name="id" type="I">
+            <key />
+            <autoincrement />
+        </field>
+        <field name="co_enrollment_flow_wedge_id" type="I">
+            <constraint>REFERENCES cm_co_enrollment_flow_wedges(id)</constraint>
+        </field>
+        <field name="created" type="T" />
+        <field name="modified" type="T" />
+        <field name="revision" type="I" />
+        <field name="deleted" type="L" />
+        <field name="actor_identifier" type="C" size="256" />
+        <field name="access01_enroller_id" type="I">
+            <constraint>REFERENCES cm_access01_enrollers(id)</constraint>
+        </field>
+        <index name="access01_enrollers_i1">
+            <col>co_enrollment_flow_wedge_id</col>
+        </index>
+        <index name="access01_enrollers_i2">
+            <col>access01_enroller_id</col>
+        </index>
+    </table>
+
+    <table name="access01_petitions">
+        <field name="id" type="I">
+            <key />
+            <autoincrement />
+        </field>
+        <field name="co_petition_id" type="I">
+            <notnull />
+            <constraint>REFERENCES cm_co_petitions(id)</constraint>
+        </field>
+        <field name="access_organization_id" type="I" >
+            <constraint>REFERENCES cm_access_organizations(id)</constraint>
+        </field>
+
+        <field name="created" type="T" />
+        <field name="modified" type="T" />
+
+        <index name="access01_petitions_i1">
+            <col>co_petition_id</col>
+        </index>
+    </table>
+
+</schema>
