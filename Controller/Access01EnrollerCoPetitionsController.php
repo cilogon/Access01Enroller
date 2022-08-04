@@ -385,8 +385,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $loginServerName = env("OIDC_CLAIM_idp_name");
 
     if($loginServerName == "ACCESS") {
-      // TODO Replace with proper redirect.
-      $this->redirect("https://www.google.com");
+      $this->redirect("https://identity.access-ci.org/duplicate-enrollment");
     }
 
     // If the email asserted by the IdP is known then
@@ -401,8 +400,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $emailAddress = $this->CoPetition->EnrolleeCoPerson->EmailAddress->find('first', $args);
 
     if($emailAddress) {
-      // TODO Replace with proper redirect.
-      $this->redirect("https://www.google.com");
+      $this->redirect("https://identity.access-ci.org/email-exists");
     }
 
     $this->redirect($onFinish);
