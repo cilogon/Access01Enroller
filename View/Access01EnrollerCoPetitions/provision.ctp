@@ -5,6 +5,24 @@
 
   print $this->element("pageTitleAndButtons", $params);
 ?>
+<script type="text/javascript">
+
+function displayForm() {
+  $("#form_container").show();
+  $("#button_yes").hide();
+  $("#button_no").hide();
+}
+
+function submitFormAfterNo() {
+  // Make sure the form fields for password are clear then submit.
+  $("#provision_krbpassword").children('input').val('');
+
+  $("#KrbProvisionForm").submit();
+}
+
+function js_local_onload() {
+}
+</script>
 
 <p>
 You may continue to authenticate using the <?php print $vv_login_server; ?> login server
@@ -16,14 +34,15 @@ and use the ACCESS CI login server.
 Do you want to set a password for your new ACCESS ID <?php print $vv_access_id; ?>?
 </p>
 
-<button class="btn btn-primary" type="button">
+<button id="button_yes" class="btn btn-primary" type="button" onclick="displayForm()">
 Yes
 </button>
 
-<button class="btn btn-primary" type="button">
+<button id="button_no" class="btn btn-primary" type="button" onclick="submitFormAfterNo()">
 No
 </button>
 
+<div id="form_container" style="display:none">
 <?php
   print $this->Form->create(
     'KrbAuthenticator.Krb',
@@ -87,5 +106,5 @@ No
     </li>
 </ul>
 
-<?php
-  print $this->Form->end();
+<?php print $this->Form->end(); ?>
+</div>
