@@ -8,7 +8,9 @@
 //
 // finalize:
 //   - Used to add OrgIdentity with ACCESS CI ePPN as
-//     login identifier.
+//     login identifier, and an ePPN and OIDC sub
+//     with the form <ACCESS ID>@access-ci.org on the
+//     CO Person record.
 //
 // petitionerAttributes:
 //   - Used to collect the ACCESS Organization for the
@@ -59,8 +61,6 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $this->log("Access01Enroller Finalize: Petition is " . print_r($petition, true));
 
     $coId = $petition['CoPetition']['co_id'];
-    $this->log("FOO coId is " . print_r($petition['CoPetition']['co_id'], true));
-    $this->log("FOO coId is $coId");
     $coPersonId = $petition['CoPetition']['enrollee_co_person_id'];
 
     // Find the ACCESS ID.
@@ -73,20 +73,20 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
 
     if(!empty($accessId)) {
       try {
-        // Create the OrgIdentity.
-
         // Begin a transaction.
         $dataSource = $this->CoPetition->getDataSource();
         $dataSource->begin();
-      
-        // TODO put this all in a transaction and properly
-        // check for errors when saving.
+
+        // Create the OrgIdentity.
         $this->CoPetition->EnrolleeOrgIdentity->clear();
 
         $data = array();
         $data['EnrolleeOrgIdentity']['co_id'] = $coId;
 
-        if(!$this->CoPetition->EnrolleeOrgIdentity->save($data)) {
+        $opts = array();
+        $opts['provision'] = false;
+
+        if(!$this->CoPetition->EnrolleeOrgIdentity->save($data, $opts)) {
           $msg = "ERROR could not create OrgIdentity: ";
           $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
           $msg = $msg . "Validation errors: ";
@@ -105,7 +105,10 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         $data['CoOrgIdentityLink']['co_person_id'] = $coPersonId;
         $data['CoOrgIdentityLink']['org_identity_id'] = $orgIdentityId;
 
-        if(!$this->CoPetition->EnrolleeCoPerson->CoOrgIdentityLink->save($data)) {
+        $opts = array();
+        $opts['provision'] = false;
+
+        if(!$this->CoPetition->EnrolleeCoPerson->CoOrgIdentityLink->save($data, $opts)) {
           $msg = "ERROR could not create CoOrgIdentityLink: ";
           $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
           $msg = $msg . "Validation errors: ";
@@ -128,7 +131,10 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         $data['Name']['org_identity_id'] = $orgIdentityId;
         $data['Name']['primary_name'] = true;
 
-        if(!$this->CoPetition->EnrolleeOrgIdentity->Name->save($data)) {
+        $opts = array();
+        $opts['provision'] = false;
+
+        if(!$this->CoPetition->EnrolleeOrgIdentity->Name->save($data, $opts)) {
           $msg = "ERROR could not create Name: ";
           $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
           $msg = $msg . "Validation errors: ";
@@ -149,7 +155,10 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         $data['Identifier']['login'] = true;
         $data['Identifier']['org_identity_id'] = $orgIdentityId;
 
-        if(!$this->CoPetition->EnrolleeOrgIdentity->Identifier->save($data)) {
+        $opts = array();
+        $opts['provision'] = false;
+
+        if(!$this->CoPetition->EnrolleeOrgIdentity->Identifier->save($data, $opts)) {
           $msg = "ERROR could not create Identifier: ";
           $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
           $msg = $msg . "Validation errors: ";
@@ -164,6 +173,87 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
       } catch (Exception $e) {
         // We want to keep the enrollment flow going even if unable
         // to create the OrgIdentity so just continue.
+      }
+
+      // Search for an ACCESS ePPN and if not found then add one.
+      $args = array();
+      $args['conditions']['Identifier.co_person_id'] = $coPersonId;
+      $args['conditions']['Identifier.type'] = IdentifierEnum::ePPN;
+      $args['conditions']['Identifier.status'] = SuspendableStatusEnum::Active;
+      $args['conditions']['Identifier.identifier'] = $accessId . '@access-ci.org';
+      $args['contain'] = false;
+
+      $identifier = $this->CoPetition->EnrolleeCoPerson->Identifier->find('first', $args);
+
+      if(!$identifier) {
+        try {
+          // Attach an Identifier of type EPPN to the CO Person record.
+          $this->CoPetition->EnrolleeCoPerson->Identifier->clear();
+  
+          $data = array();
+          $data['Identifier']['identifier'] = $accessId . '@access-ci.org';
+          $data['Identifier']['type'] = IdentifierEnum::ePPN;
+          $data['Identifier']['status'] = SuspendableStatusEnum::Active;
+          $data['Identifier']['login'] = false;
+          $data['Identifier']['co_person_id'] = $coPersonId;
+  
+          $opts = array();
+          $opts['provision'] = false;
+  
+          if(!$this->CoPetition->EnrolleeCoPerson->Identifier->save($data, $opts)) {
+            $msg = "ERROR could not create Identifier: ";
+            $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
+            $msg = $msg . "Validation errors: ";
+            $msg = $msg . print_r($this->CoPetition->EnrolleeCoPerson->Identifier->validationErrors, true);
+            $this->log($msg);
+            $dataSource->rollback();
+            throw new RuntimeException($msg);
+          }
+        } catch (Exception $e) {
+          // We want to keep the enrollment flow going even if unable
+          // to create the Identifier so just continue.
+        }
+      }
+
+      // Search for an ACCESS OIDC sub and if not found then add one.
+      $args = array();
+      $args['conditions']['Identifier.co_person_id'] = $coPersonId;
+      $args['conditions']['Identifier.type'] = IdentifierEnum::OIDCsub;
+      $args['conditions']['Identifier.status'] = SuspendableStatusEnum::Active;
+      $args['conditions']['Identifier.identifier'] = $accessId . '@access-ci.org';
+      $args['contain'] = false;
+
+      $identifier = $this->CoPetition->EnrolleeCoPerson->Identifier->find('first', $args);
+
+      if(!$identifier){
+        try {
+          // Attach an Identifier of type OIDC sub to the CO Person record.
+          $this->CoPetition->EnrolleeCoPerson->Identifier->clear();
+  
+          $data = array();
+          $data['Identifier']['identifier'] = $accessId . '@access-ci.org';
+          $data['Identifier']['type'] = IdentifierEnum::OIDCsub;
+          $data['Identifier']['status'] = SuspendableStatusEnum::Active;
+          $data['Identifier']['login'] = false;
+          $data['Identifier']['co_person_id'] = $coPersonId;
+  
+          $opts = array();
+          $opts['provision'] = false;
+  
+          if(!$this->CoPetition->EnrolleeCoPerson->Identifier->save($data, $opts)) {
+            $msg = "ERROR could not create Identifier: ";
+            $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
+            $msg = $msg . "Validation errors: ";
+            $msg = $msg . print_r($this->CoPetition->EnrolleeCoPerson->Identifier->validationErrors, true);
+            $this->log($msg);
+            $dataSource->rollback();
+            throw new RuntimeException($msg);
+          }
+  
+        } catch (Exception $e) {
+          // We want to keep the enrollment flow going even if unable
+          // to create the Identifier so just continue.
+        }
       }
     }
 
