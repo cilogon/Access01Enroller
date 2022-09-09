@@ -485,11 +485,11 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
 
     $args = array();
     $args['conditions']['EmailAddress.mail'] = $email;
-    $args['contain'] = false;
+    $args['contain'] = 'CoPerson';
 
     $emailAddress = $this->CoPetition->EnrolleeCoPerson->EmailAddress->find('first', $args);
 
-    if($emailAddress) {
+    if($emailAddress && $emailAddress['CoPerson']['co_id'] == 2) {
       $this->redirect("https://identity.access-ci.org/email-exists");
     }
 
