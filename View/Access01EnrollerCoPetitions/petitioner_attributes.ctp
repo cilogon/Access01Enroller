@@ -61,13 +61,6 @@
       return false;
     });
 
-    $("#organization-choose-other-link").click(function(e) {
-      $("#Access01PetitionAccessOrganizationId").val(<?php print $vv_access_organization_other_id; ?>);
-      displaySpinner();
-      e.preventDefault();
-      $("#Access01PetitionPetitionerAttributesForm").submit();
-    });
-
     $('[data-toggle="tooltip"]').tooltip();
 
   });
@@ -98,8 +91,8 @@ Type in the box below to find and select your primary home organization.
 
 <div id="organization-choose-other">
   <p>
-  Can't find your organization? <a id="organization-choose-other-link" href="">Click here</a>
-  to select 'Other' and ACCESS staff will follow up later with you.
+  Can't find your organization? Enter 'Other' in the search box,
+  select it, and ACCESS staff will follow up later with you.
   </p>
 </div>
 
