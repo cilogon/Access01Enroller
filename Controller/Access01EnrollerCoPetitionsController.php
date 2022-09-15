@@ -295,21 +295,15 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     // not have a direct relationship with it.
     $accessOrganizationModel = new AccessOrganization();
 
-    // Pull the list of ACCESS Organizations for drop down in view.
+    // Find the 'Other' organization and set its ID for the view.
 
     $args = array();
-    $args['conditions']['AccessOrganization.status'] = AccessOrganizationStatusEnum::Active;
+    $args['conditions']['AccessOrganization.name'] = "Other";
     $args['contain'] = false;
 
-    $accessOrganizations = $accessOrganizationModel->find('all', $args);
+    $accessOther = $accessOrganizationModel->find('first', $args);
 
-    $vv_access_organizations = array();
-    foreach($accessOrganizations as $a) {
-      $vv_access_organizations[$a['AccessOrganization']['id']] = $a['AccessOrganization']['name'];
-    }
-
-    asort($vv_access_organizations);
-    $this->set('vv_access_organizations', $vv_access_organizations);
+    $this->set('vv_access_organization_other_id', $accessOther['AccessOrganization']['id']);
 
     // Process incoming POST data.
     if($this->request->is('post')) {
