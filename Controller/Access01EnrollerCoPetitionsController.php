@@ -469,6 +469,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $loginServerName = env("OIDC_CLAIM_idp_name");
 
     if($loginServerName == "ACCESS") {
+      $this->log("Redirecting federated enrollment because ACCESS IdP was used for authentication");
       $this->redirect("https://identity.access-ci.org/duplicate-enrollment");
     }
 
@@ -484,6 +485,9 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $emailAddress = $this->CoPetition->EnrolleeCoPerson->EmailAddress->find('first', $args);
 
     if($emailAddress && $emailAddress['CoPerson']['co_id'] == 2) {
+      $msg = "Redirecting federated enrollment with email $email ";
+      $msg = $msg . "and CO Person ID " . $emailAddress['CoPerson']['id'];
+      $this->log($msg);
       $this->redirect("https://identity.access-ci.org/email-exists");
     }
 
