@@ -19,8 +19,30 @@
  // Unlock the field so we can manipulate with JavaScript and not trigger the security code.
  $this->Form->unlockField('Access01Petition.access_organization_id');
 ?> 
-<script>
+<script type="text/javascript">
   $(function() {
+
+    $("#cannot-find-organization-dialog").dialog({
+      autoOpen: false,
+      buttons: {
+      "<?php print _txt('pl.access01_enroller.dialog.button.add'); ?>": function() {
+        $(this).dialog("close");
+        displaySpinner();
+        $("#Access01PetitionAccessOrganizationId").val(<?php print $vv_access_organization_other_id ?>);
+        $("#Access01PetitionPetitionerAttributesForm").submit();
+      },
+          "<?php print _txt('pl.access01_enroller.dialog.button.cancel'); ?>": function() { $(this).dialog("close"); },
+        },
+      modal: true,
+      show: {
+        effect: "fade"
+        },
+      hide:{
+        effect: "fade"
+        }
+      }
+    );
+
     $("#organization-choose").autocomplete({
       source: "<?php print $this->Html->url(array('plugin' => 'access_organization', 'controller' => 'access_organizations', 'action' => 'find', 'co' => $cur_co['Co']['id'])); ?>",
       minLength: 3,
@@ -63,6 +85,16 @@
 
     $('[data-toggle="tooltip"]').tooltip();
 
+    $("#cannot-find-organization-button").click(function(e) {
+      e.preventDefault();
+      $("#organization-choose-name").hide();
+      $("#Access01PetitionAccessOrganizationId").val("");
+      $("#organization-choose-button").prop('disabled', true).focus();
+      $("#organization-choose-clear-button").hide();
+      $("#organization-choose").val("").show().focus();
+      $("#cannot-find-organization-dialog").dialog("open");
+    });
+
   });
 
 </script>
@@ -90,10 +122,13 @@ Type in the box below to find and select your primary home organization.
 </div>
 
 <div id="organization-choose-other">
-  <p>
-  Can't find your organization? Enter 'Other' in the search box,
-  select it, and ACCESS staff will follow up later with you.
-  </p>
+  <button id="cannot-find-organization-button" class="btn btn-primary btn-sm"><?php print _txt('pl.access01_enroller.button.cannot.find'); ?></button>
 </div>
 
-<?php print $this->Form->end();
+<?php print $this->Form->end(); ?>
+
+<div id="cannot-find-organization-dialog" title="<?php print _txt('pl.access01_enroller.dialog.title'); ?>" style="display:none">
+<p>Can't find your organization? Click Add My Organization to request your organization be added to the system. Please note that adding a new
+organization will delay your registration.
+</p>
+</div>

@@ -274,6 +274,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $args['contain']['EnrolleeCoPerson']['CoOrgIdentityLink'] = 'OrgIdentity';
     $args['contain']['EnrolleeCoPerson'][] = 'Name';
     $args['contain']['EnrolleeCoPerson'][] = 'Identifier';
+    $args['contain']['EnrolleeCoPerson'][] = 'EmailAddress';
 
     $petition = $this->CoPetition->find('first', $args);
     $this->log("Petitioner Attributes: Petition is " . print_r($petition, true));
@@ -302,11 +303,17 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $args['contain'] = false;
 
     $accessOther = $accessOrganizationModel->find('first', $args);
+    $accessOtherId = $accessOther['AccessOrganization']['id'];
 
-    $this->set('vv_access_organization_other_id', $accessOther['AccessOrganization']['id']);
+    $this->set('vv_access_organization_other_id', $accessOtherId);
 
     // Process incoming POST data.
     if($this->request->is('post')) {
+      // Trap a POST where the organization is Other.
+      if($this->request->data['Access01Petition']['access_organization_id'] == $accessOtherId) {
+        $this->haltOnOtherAccessOrganization($petition);
+      }
+
       // Validate incoming data.
       $data = $this->validatePost();
 
@@ -492,6 +499,38 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     }
 
     $this->redirect($onFinish);
+  }
+
+  /**
+   * Stop the flow when Other organization is POST'ed and redirect.
+   *
+   * @param array Array representing the petitionObject.
+   * @return none
+   */
+
+  protected function haltOnOtherAccessOrganization($petitionObject) {
+    // Set the petition to Denied and delete the token so that it
+    // cannot be used to access the form again, for example by
+    // hitting the back button.
+    $this->CoPetition->id = $petitionObject['CoPetition']['id'];
+    $this->CoPetition->saveField('status', PetitionStatusEnum::Denied);
+    $this->CoPetition->saveField('petitioner_token', null);
+
+    // Expunge the CO Person record.
+    $coPersonId = $petitionObject['CoPetition']['enrollee_co_person_id'];
+    $this->CoPetition->Co->CoPerson->expunge($coPersonId, 1);
+
+    // Prepare redirect for after logout to the form for
+    // requesting a new organization.
+    $this->Session->write('Logout.redirect', "https://support.access-ci.org/form/organization-request");
+
+    // Spoil the stored onFinish redirect.
+    $this->Session->consume('access01.plugin.petitionerAttributes.onFinish');
+
+    // Redirect to the /auth/logout handler that deletes the Auth part of
+    // the PHP session and then redirects to the Users controller with the
+    // logout action, which then causes the final redirect.
+    $this->redirect("/auth/logout");
   }
 
   /**

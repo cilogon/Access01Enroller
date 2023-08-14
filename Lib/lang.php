@@ -11,4 +11,8 @@ $cm_access01_enroller_texts['en_US'] = array(
   'pl.access01_enroller.organization.desc' => 'Please select your primary home organization',
   'pl.access01_enroller.provision.title' => 'Your new ACCESS ID is %1$s',
   'pl.access01_enroller.button.label.submit' => 'Submit',
+  'pl.access01_enroller.button.cannot.find' => 'I cannot find my organization',
+  'pl.access01_enroller.dialog.button.add' => 'Add New Organization',
+  'pl.access01_enroller.dialog.button.cancel' => 'Cancel',
+  'pl.access01_enroller.dialog.title' => 'Add New Organization',
 );
