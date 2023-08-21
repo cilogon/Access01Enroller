@@ -473,7 +473,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     // the user authenticated using the ACCESS IdP since
     // the user then already has an ACCESS account
     // and is registered.
-    $loginServerName = env("OIDC_CLAIM_idp_name");
+    $loginServerName = env("REDIRECT_OIDC_CLAIM_idp_name");
 
     if($loginServerName == "ACCESS") {
       $this->log("Redirecting federated enrollment because ACCESS IdP was used for authentication");
@@ -483,7 +483,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     // If the email asserted by the IdP is known then
     // most likely the user already has an ACCESS account
     // and just needs to recover it.
-    $email = env("OIDC_CLAIM_email");
+    $email = env("REDIRECT_OIDC_CLAIM_email");
 
     $args = array();
     $args['conditions']['EmailAddress.mail'] = $email;
