@@ -489,13 +489,15 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     $args['conditions']['EmailAddress.mail'] = $email;
     $args['contain'] = 'CoPerson';
 
-    $emailAddress = $this->CoPetition->EnrolleeCoPerson->EmailAddress->find('first', $args);
+    $emailAddresses = $this->CoPetition->EnrolleeCoPerson->EmailAddress->find('all', $args);
 
-    if($emailAddress && $emailAddress['CoPerson']['co_id'] == 2) {
-      $msg = "Redirecting federated enrollment with email $email ";
-      $msg = $msg . "and CO Person ID " . $emailAddress['CoPerson']['id'];
-      $this->log($msg);
-      $this->redirect("https://identity.access-ci.org/email-exists");
+    foreach($emailAddresses as $emailAddress) {
+      if($emailAddress && $emailAddress['CoPerson']['co_id'] == 2) {
+        $msg = "Redirecting federated enrollment with email $email ";
+        $msg = $msg . "and CO Person ID " . $emailAddress['CoPerson']['id'];
+        $this->log($msg);
+        $this->redirect("https://identity.access-ci.org/email-exists");
+      }
     }
 
     $this->redirect($onFinish);
