@@ -22,8 +22,8 @@
 //     sets the password in the KDC.
 //
 // start:
-//   - Used to detect if the ACCESS IdP was used for 
-//     authentication and redirect, or if the email 
+//   - Used to detect if the ACCESS IdP was used for
+//     authentication and redirect, or if the email
 //     asserted by the IdP is already known and attached
 //     to a registered user.
 //
@@ -35,11 +35,14 @@ App::uses('CoPetitionsController', 'Controller');
 App::uses('HtmlHelper', 'View/Helper');
 App::uses('Krb', 'KrbAuthenticator.Model');
 App::uses('KrbAuthenticator', 'KrbAuthenticator.Model');
- 
+
 class Access01EnrollerCoPetitionsController extends CoPetitionsController {
   // Class name, used by Cake
   public $name = "Access01EnrollerCoPetitions";
-  public $uses = array("CoPetition");
+  public $uses = array(
+    "CoPetition",
+    "AttributeEnumeration"
+  );
 
   /**
    * Plugin functionality following finalize step:
@@ -95,7 +98,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
           $dataSource->rollback();
           throw new RuntimeException($msg);
         }
-        
+
         $orgIdentityId = $this->CoPetition->EnrolleeOrgIdentity->id;
 
         // Link the CoPerson to the OrgIdentity.
@@ -189,17 +192,17 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         try {
           // Attach an Identifier of type EPPN to the CO Person record.
           $this->CoPetition->EnrolleeCoPerson->Identifier->clear();
-  
+
           $data = array();
           $data['Identifier']['identifier'] = $accessId . '@access-ci.org';
           $data['Identifier']['type'] = IdentifierEnum::ePPN;
           $data['Identifier']['status'] = SuspendableStatusEnum::Active;
           $data['Identifier']['login'] = false;
           $data['Identifier']['co_person_id'] = $coPersonId;
-  
+
           $opts = array();
           $opts['provision'] = false;
-  
+
           if(!$this->CoPetition->EnrolleeCoPerson->Identifier->save($data, $opts)) {
             $msg = "ERROR could not create Identifier: ";
             $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
@@ -229,17 +232,17 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         try {
           // Attach an Identifier of type OIDC sub to the CO Person record.
           $this->CoPetition->EnrolleeCoPerson->Identifier->clear();
-  
+
           $data = array();
           $data['Identifier']['identifier'] = $accessId . '@access-ci.org';
           $data['Identifier']['type'] = IdentifierEnum::OIDCsub;
           $data['Identifier']['status'] = SuspendableStatusEnum::Active;
           $data['Identifier']['login'] = false;
           $data['Identifier']['co_person_id'] = $coPersonId;
-  
+
           $opts = array();
           $opts['provision'] = false;
-  
+
           if(!$this->CoPetition->EnrolleeCoPerson->Identifier->save($data, $opts)) {
             $msg = "ERROR could not create Identifier: ";
             $msg = $msg . "ACCESS ID $accessId and CoPerson ID $coPersonId: ";
@@ -249,7 +252,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
             $dataSource->rollback();
             throw new RuntimeException($msg);
           }
-  
+
         } catch (Exception $e) {
           // We want to keep the enrollment flow going even if unable
           // to create the Identifier so just continue.
@@ -267,7 +270,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
    * @param Integer $id CO Petition ID
    * @param Array $onFinish URL, in Cake format
    */
-   
+
   protected function execute_plugin_petitionerAttributes($id, $onFinish) {
     $args = array();
     $args['conditions']['CoPetition.id'] = $id;
@@ -292,7 +295,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
       $this->Session->write('access01.plugin.petitionerAttributes.onFinish', $onFinish);
     }
 
-    // Create an instance of the AccessOrganization model since we do 
+    // Create an instance of the AccessOrganization model since we do
     // not have a direct relationship with it.
     $accessOrganizationModel = new AccessOrganization();
 
@@ -365,7 +368,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
    * @param Integer $id CO Petition ID
    * @param Array $onFinish URL, in Cake format
    */
-   
+
   protected function execute_plugin_provision($id, $onFinish) {
     $args = array();
     $args['conditions']['CoPetition.id'] = $id;
@@ -452,7 +455,7 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         $this->Flash->set($e->getMessage(), array('key' => 'error'));
       }
     } // POST
-    
+
     // GET fall through to view.
   }
 
@@ -462,9 +465,9 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
    * @param Integer $id CO Petition ID
    * @param Array $onFinish URL, in Cake format
    */
-   
+
   protected function execute_plugin_start($id, $onFinish) {
-    // This plugin assumes the authentication flow requires 
+    // This plugin assumes the authentication flow requires
     // authentication and so at this point we can examine
     // CGI environment variables asserted by the upstream
     // identity provider.
