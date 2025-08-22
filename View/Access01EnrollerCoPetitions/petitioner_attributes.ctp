@@ -99,21 +99,15 @@
 
 </script>
 
-<h2>Your registration is not complete yet</h2>
+<h2><?php print _txt('pl.access01_enroller.choose_org.title'); ?></h2>
 
-<p>
-You must select your primary home organization and verify
-your email address before your registration is complete.
-</p>
-
-<p>
-Type in the box below to find and select your primary home organization.
-</p>
+<div><?php print _txt('pl.access01_enroller.choose_org.search_text'); ?></div>
 
 <div id="organization-choose-search-container">
-  <label for="organization-choose" class="col-form-label-sm">Primary Home Organization: </label>
+<label for="organization-choose" class="col-form-label-sm"><?php print _txt('pl.access01_enroller.choose_org.label'); ?></label>
   <span class="co-loading-mini-input-container">
-    <input id="organization-choose" type="text" class="form-control-sm" placeholder="enter organization name" />
+  <input id="organization-choose" type="text" class="form-control-sm"
+         placeholder="<?php print _txt('pl.access01_enroller.choose_org.placeholder'); ?>" />
     <span class="co-loading-mini"><span></span><span></span><span></span></span>
   </span>
   <span id="organization-choose-name" style="display: none;"></span>
@@ -128,7 +122,5 @@ Type in the box below to find and select your primary home organization.
 <?php print $this->Form->end(); ?>
 
 <div id="cannot-find-organization-dialog" title="<?php print _txt('pl.access01_enroller.dialog.title'); ?>" style="display:none">
-<p>Can't find your organization? Click Add My Organization to request your organization be added to the system. Please note that adding a new
-organization will delay your registration.
-</p>
+    <div><?php print _txt('pl.access01_enroller.choose_org.cannot_find'); ?></div>
 </div>
