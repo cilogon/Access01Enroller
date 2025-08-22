@@ -101,7 +101,7 @@
 
 <h2><?php print _txt('pl.access01_enroller.choose_org.title'); ?></h2>
 
-<div><?php print _txt('pl.access01_enroller.choose_org.search_text'); ?></div>
+<div id="organization-choose-search-text"><?php print _txt('pl.access01_enroller.choose_org.search_text'); ?></div>
 
 <div id="organization-choose-search-container">
 <label for="organization-choose" class="col-form-label-sm"><?php print _txt('pl.access01_enroller.choose_org.label'); ?></label>
@@ -122,5 +122,5 @@
 <?php print $this->Form->end(); ?>
 
 <div id="cannot-find-organization-dialog" title="<?php print _txt('pl.access01_enroller.dialog.title'); ?>" style="display:none">
-    <div><?php print _txt('pl.access01_enroller.choose_org.cannot_find'); ?></div>
+    <div id="cannot-find-organization-dialog-text"><?php print _txt('pl.access01_enroller.choose_org.cannot_find'); ?></div>
 </div>

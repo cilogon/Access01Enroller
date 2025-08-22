@@ -15,9 +15,9 @@ $cm_access01_enroller_texts['en_US'] = array(
   'pl.access01_enroller.dialog.button.add' => 'Add New Organization',
   'pl.access01_enroller.dialog.button.cancel' => 'Cancel',
   'pl.access01_enroller.dialog.title' => 'Add New Organization',
-  'pl.access01_enroller.choose_org.title' => 'Your registration is not yet complete',
-  'pl.access01_enroller.choose_org.search_text' => 'Search for your home organization by typing a few characters in the box below. Choose your organization from the resulting matches.',
+  'pl.access01_enroller.choose_org.title' => 'Specify Your Organization',
+  'pl.access01_enroller.choose_org.search_text' => 'Search for your home organization (e.g., university, company, or research project) by typing a few letters in the box below. Choose your organization from the resulting matches.',
   'pl.access01_enroller.choose_org.label' => 'Home Organization:',
-  'pl.access01_enroller.choose_org.placeholder' => 'Search for organization',
-  'pl.access01_enroller.choose_org.cannot_find' => 'Can\'t find your organization? Click "Add New Organization" to request your organization be added to the system. Alternatively, search for "Individual / Unaffiliated" to complete your registration, and then <a target="_blank" href="https://support.access-ci.org/form/organization-request">request your organization</a>.',
+  'pl.access01_enroller.choose_org.placeholder' => 'Type to search',
+  'pl.access01_enroller.choose_org.cannot_find' => 'Can\'t find your organization? Click "Add New Organization" to request your organization be added to the system. Alternatively, search for "Individual / Unaffiliated" to complete your registration, and then contact "support@access-ci.atlassian.net" to request your organization be added.',
 );
