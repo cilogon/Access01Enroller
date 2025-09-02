@@ -19,5 +19,5 @@ $cm_access01_enroller_texts['en_US'] = array(
   'pl.access01_enroller.choose_org.search_text' => 'Search for your home organization (e.g., university, company, or research project) by typing a few letters in the box below. Choose your organization from the resulting matches.',
   'pl.access01_enroller.choose_org.label' => 'Home Organization:',
   'pl.access01_enroller.choose_org.placeholder' => 'Type to search',
-  'pl.access01_enroller.choose_org.cannot_find' => 'Can\'t find your organization? Click "Add New Organization" to request your organization be added to the system. Alternatively, search for "Individual / Unaffiliated" to complete your registration, and then contact "support@access-ci.atlassian.net" to request your organization be added.',
+  'pl.access01_enroller.choose_org.cannot_find' => 'Can\'t find your organization? Click "Add New Organization" to request your organization be added to the system. Please note that adding a new organization will delay your registration.',
 );
