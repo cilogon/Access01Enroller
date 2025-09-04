@@ -20,4 +20,6 @@ $cm_access01_enroller_texts['en_US'] = array(
   'pl.access01_enroller.choose_org.label' => 'Home Organization:',
   'pl.access01_enroller.choose_org.placeholder' => 'Type to search',
   'pl.access01_enroller.choose_org.cannot_find' => 'Can\'t find your organization? Click "Add New Organization" to request your organization be added to the system. Please note that adding a new organization will delay your registration.',
+  'pl.access01_enroller.redirect.duplicate_enrollment' => 'https://identity.access-ci.org/duplicate-enrollment',
+  'pl.access01_enroller.redirect.email_exists' => 'https://identity.access-ci.org/email-exists',
 );

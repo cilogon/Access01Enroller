@@ -478,9 +478,19 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
     // and is registered.
     $loginServerName = env("REDIRECT_OIDC_CLAIM_idp_name");
 
-    if($loginServerName == "ACCESS") {
+    if(preg_match('/^ACCESS/', $loginServerName)) {
       $this->log("Redirecting federated enrollment because ACCESS IdP was used for authentication");
-      $this->redirect("https://identity.access-ci.org/duplicate-enrollment");
+      // Unset the global ACCESS cookie for the universal toolbar so that we
+      // don't get infinite redirects on operations.access-ci.org .
+      setcookie('SESSaccesscisso', '', array(
+          'expires' => 1,
+          'path' => '/',
+          'domain' => '.access-ci.org',
+          'secure' => true,
+          'httponly' => false,
+          'samesite' => 'Lax'
+      ));
+      $this->redirect(_txt('pl.access01_enroller.redirect.duplicate_enrollment'));
     }
 
     // If the email asserted by the IdP is known then
@@ -499,7 +509,17 @@ class Access01EnrollerCoPetitionsController extends CoPetitionsController {
         $msg = "Redirecting federated enrollment with email $email ";
         $msg = $msg . "and CO Person ID " . $emailAddress['CoPerson']['id'];
         $this->log($msg);
-        $this->redirect("https://identity.access-ci.org/email-exists");
+          // Unset the global ACCESS cookie for the universal toolbar so that we
+          // don't get infinite redirects on operations.access-ci.org .
+          setcookie('SESSaccesscisso', '', array(
+              'expires' => 1,
+              'path' => '/',
+              'domain' => '.access-ci.org',
+              'secure' => true,
+              'httponly' => false,
+              'samesite' => 'Lax'
+          ));
+        $this->redirect(_txt('pl.access01_enroller.redirect.email_exists'));
       }
     }
 
